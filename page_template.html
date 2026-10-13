@@ -59,7 +59,9 @@ select:focus-visible, input:focus-visible, button:focus-visible, a:focus-visible
 .count b { color: var(--ink); font-variant-numeric: tabular-nums; }
 
 ol.results { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
-.shoe { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; grid-template-columns: 2.6rem minmax(0, 1fr) auto; gap: 4px 14px; }
+.shoe { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; grid-template-columns: 2.6rem 120px minmax(0, 1fr) auto; gap: 4px 16px; }
+.thumb { width: 120px; max-width: 100%; aspect-ratio: 1; object-fit: contain; background: #fff; border: 1px solid var(--line); border-radius: 6px; }
+.thumb-link { grid-row: span 4; align-self: start; line-height: 0; }
 .rank { font: 700 1.6rem/1 var(--display); color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 2px; }
 .main { min-width: 0; }
 .brand { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
@@ -71,16 +73,17 @@ ol.results { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap:
 .score .avg { font: 700 1.5rem/1 var(--display); }
 .score .n { font-size: .8rem; color: var(--muted); }
 .score .adj { font-size: .78rem; color: var(--muted); }
-.price { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.price { grid-column: 3 / -1; display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: baseline; margin-top: 6px; font-variant-numeric: tabular-nums; }
 .price .now { font-weight: 600; font-size: 1.05rem; }
 .price .rrp { color: var(--muted); text-decoration: line-through; font-size: .88rem; }
 .price .half { color: var(--accent); font-weight: 600; }
 .price .noel { color: var(--warn); font-size: .85rem; }
-.colours { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-.colours a { font-size: .82rem; color: var(--ink); text-decoration: none; border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; background: var(--bg); }
+.colours { grid-column: 3 / -1; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.colours a { font-size: .82rem; color: var(--ink); text-decoration: none; border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px 3px 3px; background: var(--bg); display: inline-flex; align-items: center; gap: 6px; }
+.colours a img { width: 30px; height: 30px; object-fit: contain; background: #fff; border-radius: 4px; }
 .colours a:hover { border-color: var(--accent); color: var(--accent); }
 .colours a span { color: var(--muted); font-variant-numeric: tabular-nums; }
-details { grid-column: 2 / -1; font-size: .88rem; color: var(--muted); }
+details { grid-column: 3 / -1; font-size: .88rem; color: var(--muted); }
 details summary { cursor: pointer; width: fit-content; }
 details p { margin: 4px 0 0; max-width: 75ch; }
 .more { display: block; margin: 18px auto 0; font: 600 .95rem var(--body); color: var(--accent); background: var(--surface); border: 1px solid var(--accent); border-radius: 6px; padding: 9px 18px; cursor: pointer; }
@@ -88,8 +91,10 @@ details p { margin: 4px 0 0; max-width: 75ch; }
 footer { margin-top: 32px; font-size: .85rem; color: var(--muted); max-width: 75ch; display: grid; gap: 6px; }
 footer p { margin: 0; }
 @media (max-width: 560px) {
-  .shoe { grid-template-columns: minmax(0, 1fr) auto; }
+  .shoe { grid-template-columns: 76px minmax(0, 1fr) auto; gap: 4px 12px; }
   .rank { display: none; }
+  .thumb-link { grid-row: auto; }
+  .thumb { width: 76px; }
   .price, .colours, details { grid-column: 1 / -1; }
   header h1 { font-size: 2rem; }
 }
@@ -189,6 +194,7 @@ $("elig").addEventListener("change", () => { state.elig = $("elig").checked; upd
 $("more").addEventListener("click", () => { state.shown += PAGE; render(); });
 
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const img = (c) => c.i || `https://cdn.sportsshoes.com/product/${c.s[0]}/${c.s}/${c.s}_400_1.jpg`;
 const gbp = (n) => "£" + (Math.round(n * 100) / 100).toFixed(2);
 const stars = (r) => { const f = Math.round(r * 2) / 2; return "★".repeat(Math.floor(f)) + (f % 1 ? "½" : "") ; };
 
@@ -229,6 +235,7 @@ function render() {
     const priceTxt = cols.length > 1 && cols.some((c) => c.p !== cheapest.p) ? "from " + gbp(cheapest.p) : gbp(cheapest.p);
     return `<li class="shoe">
       <div class="rank">${i + 1}</div>
+      <a class="thumb-link" href="${esc(cheapest.u)}" target="_blank" rel="noopener"><img class="thumb" src="${img(cheapest)}" alt="${esc(m.b + " " + m.n + ", " + (cheapest.col || ""))}" loading="lazy"></a>
       <div class="main">
         <div class="brand">${esc(m.b)} · ${g}</div>
         <div class="name">${esc(m.n)}</div>
@@ -236,7 +243,7 @@ function render() {
       </div>
       <div class="score">${m.c ? `<span class="stars" aria-hidden="true">${stars(m.r)}</span><span class="avg">${m.r.toFixed(1)}</span><span class="n">${m.c.toLocaleString()} review${m.c === 1 ? "" : "s"}</span><span class="adj">score ${m.a.toFixed(2)}</span>` : `<span class="n">No reviews</span>`}</div>
       <div class="price"><span class="now">${priceTxt}</span>${cheapest.rrp > cheapest.p ? `<span class="rrp">${gbp(cheapest.rrp)}</span><span class="n">${Math.round(disc * 100)}% off</span>` : ""}${cheapest.v ? `<span class="half">${gbp(cheapest.p / 2)} with 50% code</span>` : `<span class="noel">Not code eligible</span>`}</div>
-      <div class="colours">${cols.map((c) => `<a href="${esc(c.u)}" target="_blank" rel="noopener">${esc(c.col || c.s)} <span>${gbp(c.p)}</span></a>`).join("")}</div>
+      <div class="colours">${cols.map((c) => `<a href="${esc(c.u)}" target="_blank" rel="noopener"><img src="${img(c)}" alt="" loading="lazy">${esc(c.col || c.s)} <span>${gbp(c.p)}</span></a>`).join("")}</div>
       ${m.d ? `<details><summary>About this shoe</summary><p>${esc(m.d)}</p></details>` : ""}
     </li>`;
   }).join("") : `<li class="empty">No shoes match. Try a different size or fewer filters.</li>`;
@@ -244,6 +251,7 @@ function render() {
   $("more").textContent = `Show more (${(total - state.shown).toLocaleString()} left)`;
 }
 
+$("results").addEventListener("error", (e) => { if (e.target.tagName === "IMG") e.target.style.visibility = "hidden"; }, true);
 compute(); render();
 </script>
 

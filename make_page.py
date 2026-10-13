@@ -45,7 +45,7 @@ for (brand, _), rs in models.items():
         "k": [{
             "s": r["sku"], "col": r["colour"], "p": (r["prices"] or {}).get("price"), "rrp": (r["prices"] or {}).get("retailPrice"),
             "v": "vitality-code-eligible" in (r["promotions"] or []) and not r["excluded_from_promotions"],
-            "u": r["url"], "z": [s["uk"] for s in r["sizes"] if s["in_stock"]],
+            "u": r["url"], "i": r.get("image"), "z": [s["uk"] for s in r["sizes"] if s["in_stock"]],
         } for r in sorted(rs, key=lambda r: (r["prices"] or {}).get("price") or 0)],
     })
 

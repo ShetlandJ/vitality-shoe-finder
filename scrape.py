@@ -48,6 +48,11 @@ def listing():
     return found
 
 
+def thumb(images):
+    # cdn.sportsshoes.com lacks images for many newer SKUs; the BigCommerce stencil URL is always present
+    return images[0].replace("/stencil/original/", "/stencil/400x400/") if images else None
+
+
 def product(sku):
     f = RAW / f"{sku}.json"
     if f.exists():
@@ -74,6 +79,7 @@ def product(sku):
         "features": [re.sub(r"<[^>]+>", "", x).strip() for x in p.get("features") or []],
         "description_text": re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", p.get("description") or "")).strip(),
         "parent_sku": p.get("parentSku"),
+        "image": thumb(p.get("images")),
         "rating": stats.get("AverageOverallRating"), "review_count": stats.get("TotalReviewCount"),
         "sizes": sizes, "reviews": reviews,
     }
