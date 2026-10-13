@@ -44,7 +44,8 @@ for (brand, _), rs in models.items():
         "d": (best["short_description"] or "")[:400],
         "k": [{
             "s": r["sku"], "col": r["colour"], "p": (r["prices"] or {}).get("price"), "rrp": (r["prices"] or {}).get("retailPrice"),
-            "v": "vitality-code-eligible" in (r["promotions"] or []) and not r["excluded_from_promotions"],
+            # 1 = eligible, 2 = tagged eligible but also flagged excluded from promotions (Brooks), 0 = not eligible
+            "v": (2 if r["excluded_from_promotions"] else 1) if "vitality-code-eligible" in (r["promotions"] or []) else 0,
             "u": r["url"], "i": r.get("image"), "z": [s["uk"] for s in r["sizes"] if s["in_stock"]],
         } for r in sorted(rs, key=lambda r: (r["prices"] or {}).get("price") or 0)],
     })
