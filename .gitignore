@@ -1,0 +1,5 @@
+data/raw/
+data/shoes.db
+data/errors.json
+data/listing.json
+__pycache__/
