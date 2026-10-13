@@ -162,6 +162,11 @@ const LABEL = { road: "Road", Trail: "Trail", "road to trail": "Road to trail", 
 const state = { g: "all", size: "", minrev: "0", maxprice: "", sort: "adj", q: "", elig: true, terrain: [], stability: [], shown: PAGE };
 
 try { Object.assign(state, JSON.parse(localStorage.getItem("finder") || "{}"), { shown: PAGE }); } catch (e) {}
+// Shareable links: ?q=endorphin+speed&size=11&g=m (overrides remembered filters)
+const params = new URLSearchParams(location.search);
+if ([...params.keys()].length) {
+  Object.assign(state, { q: params.get("q") || "", size: params.get("size") || "", g: params.get("g") || "all", terrain: [], stability: [], minrev: "0", maxprice: "" });
+}
 const save = () => { try { localStorage.setItem("finder", JSON.stringify({ ...state, shown: undefined })); } catch (e) {} };
 
 const sizeKey = (s) => { const n = parseFloat(s); return isNaN(n) ? 999 : n; };
